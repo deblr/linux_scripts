@@ -6,7 +6,7 @@
 
 echo "===================================="
 echo "# Install shadowsocks              #"
-echo "# By Declr                         #"
+echo "# By Deblr                         #"
 echo "# Address <kaisen341125@gmail.com> #"
 echo "===================================#"
 
