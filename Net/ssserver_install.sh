@@ -22,7 +22,7 @@ ss_pwd=HACK_$ss_name
 pip_dir="https://bootstrap.pypa.io/get-pip.py"
 local_ip=`ip route get 1 | cut -d " " -f7`
 
-###################################
+#### create shadowsocks' config file #####
 create_config(){
         echo " creat shadowsocks.json"
         cat > $ss_config  << EOF
@@ -83,11 +83,16 @@ else
 fi
 
 ##########################################
-#		rd.rclocal
+#	change rd.rclocal
 ###########################################
-#cat << EOF |sudo tee -a $ss_rd
-#sudo nohup ssserver -c "/etc/shadowsocks.json" start &
-#EOF
-
-
-
+s=`cat /etc/rc.local |grep ssserver|cut -d " " -f3`
+if [ "$s" == "ssserver" ];
+then
+    echo "your already set up start for power on"
+else
+    echo "create start with power on"
+    cat > /etc/rc.local << EOF
+    sudo nohup ssservice -c "/etc/shadowsocks.json" start &
+EOF
+fi
+    
