@@ -105,7 +105,7 @@ check_rd(){
         echo "your already set up start for power on"
     else
         echo "create start with power on"
-        cat > /etc/rc.local << EOF
+        cat >> /etc/rc.local << EOF
         sudo nohup ssserver -c "/etc/shadowsocks.json" start &
 EOF
     fi
