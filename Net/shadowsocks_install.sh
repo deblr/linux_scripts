@@ -87,7 +87,7 @@ check_start(){
         echo $n_ps_return|grep -q ssserver
         if [ "$?" == "0" ];
         then
-            echo " start shadowsocks filed"
+            echo " start shadowsocks sucess"
         else
             echo " ERROR"
             echo " start shadowsocks filed check it!"
@@ -106,7 +106,7 @@ check_rd(){
     else
         echo "create start with power on"
         cat > /etc/rc.local << EOF
-        sudo nohup ssservice -c "/etc/shadowsocks.json" start &
+        sudo nohup ssserver -c "/etc/shadowsocks.json" start &
 EOF
     fi
 }
