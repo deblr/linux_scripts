@@ -38,72 +38,94 @@ EOF
         echo " creat ok"
 }
 
-##########################################
-#	unistall shadowsocks
-##########################################
-if [ "$1" == "uninstall" ];
-then
-        sudo pip uninstall shadowsocks
-else
-        echo "-n"
-fi
+#### set help message about more arguments"
+arguments_message(){  
+    echo -e "\033[31m help : \033[0m"
+    echo "     for help"
+    echo -e "\033[31m install : \033[0m"
+    echo "      install shadowsocks"
+    echo -e "\033[31m uninstall : \033[0m"
+    echo "      uninstall shadowsocks "
+}
 
-##########################################
-#	Check denpendency
-##########################################
-file=`whereis ssserver | cut -d ":" -f2`
-test -n "$file" && result=0 || result=1
-if [ $result == 0 ];
-then
+####	unistall shadowsocks   #############
+uninstall_shadowsocks(){
+    sudo pip uninstall shadowsocks
+}
+
+#### Check denpendency ####################
+check_denpendency(){
+    file=`whereis ssserver | cut -d ":" -f2`
+    test -n "$file" && result=0 || result=1
+    if [ $result == 0 ];
+    then
         echo "you already had ssserver $file"
         echo "jum ssserver install"
-else
+    else
         ssserver_q="Notinstall"
         echo "install pip now"
 	# download pip & shadowsocks
         curl "$pip_dir" > /var/get-pip.py && python /var/get-pip.py
         sudo pip install shadowsocks
 	sleep 5
-fi
+     fi
+}
 
-
-##########################################
-#	check ssserver start?
-##########################################
-ps_return=`ps -ef`
-echo $ps_return|grep -q ssserver
-if [ "$?" == "1" ];
-then
-    # use function create_config() to create config
-    echo "create_config"
-    create_config
-    # start ssserver
-    sudo nohup ssserver -c "/etc/shadowsocks.json" start >/dev/null 2>/var/sslog &
-    sleep 5
-    n_ps_return=`ps -ef`
-    echo $n_ps_return|grep -q ssserver
-    if [ "$?" == "0" ];
+####	check ssserver start? #############
+check_start(){
+    ps_return=`ps -ef`
+    echo $ps_return|grep -q ssserver
+    if [ "$?" == "1" ];
     then
-        echo " start shadowsocks filed"
+        # use function create_config() to create config
+        echo "create_config"
+        create_config
+        # start ssserver
+        sudo nohup ssserver -c "/etc/shadowsocks.json" start >/dev/null 2>/var/sslog &
+        sleep 5
+        n_ps_return=`ps -ef`
+        echo $n_ps_return|grep -q ssserver
+        if [ "$?" == "0" ];
+        then
+            echo " start shadowsocks filed"
+        else
+            echo " ERROR"
+            echo " start shadowsocks filed check it!"
+        fi
     else
-        echo " ERROR"
-        echo " start shadowsocks filed check it!"
+        echo " you already runing shadowsocks"
     fi
-else
-    echo " you already runing shadowsocks"
-fi
+}
+
+#####	change rd.rclocal #####################
+check_rd(){
+    s=`cat /etc/rc.local |grep ssserver|cut -d " " -f3`
+    if [ "$s" == "ssserver" ];
+    then
+        echo "your already set up start for power on"
+    else
+        echo "create start with power on"
+        cat > /etc/rc.local << EOF
+        sudo nohup ssservice -c "/etc/shadowsocks.json" start &
+EOF
+    fi
+}
+
 
 ##########################################
-#	change rd.rclocal
-###########################################
-s=`cat /etc/rc.local |grep ssserver|cut -d " " -f3`
-if [ "$s" == "ssserver" ];
-then
-    echo "your already set up start for power on"
-else
-    echo "create start with power on"
-    cat > /etc/rc.local << EOF
-    sudo nohup ssservice -c "/etc/shadowsocks.json" start &
-EOF
+#	main
+##########################################
+if [ "$#" -gt "0" ];then
+    if [ "$1" == "h" ] || [ "$1" == "--help" ] || [ "$1" == "help" ];then
+         arguments_message
+    elif [ "$1" == "install" ];then
+         check_denpendency
+         check_start
+         check_rd
+    elif [ "$1" == "uninstall" ];then
+         uninstall_shadowsocks
+    else
+         arguments_message
+    fi
 fi
-    
+
