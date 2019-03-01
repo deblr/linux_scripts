@@ -3,6 +3,8 @@
 # Powerd by Deblr
 # Set time : 2019.03.01
 
+# local ip
+local_ip=`hostname -I |cut -d " " -f1`
 # set help
 function cpaa_help(){
     echo "-----------------------------------------"
@@ -12,8 +14,6 @@ function cpaa_help(){
     echo "3. 更新bt"
     echo "q. 退出"
 }
-
-
 
 # 检查环境和依赖
 function check_Env(){
@@ -40,9 +40,11 @@ function check_Env(){
     #创建运行目录，并进入
     user_local=`users |cut -d ' ' -f1`
     sudo test -e /etc/cpaa && echo "you already have /etc/cpaa" || mkdir /etc/cpaa
-    sudo test -e /web/pyweb && echo "you already have /web/pyweb" || mkdir /web/pyweb
+    sudo test -e /web/pyweb && echo "you already have /web/pyweb" || mkdir -p /web/pyweb
     sudo chown $user_local /etc/cpaa /web/pyweb
     sudo chgrp $user_local /etc/cpaa /web/pyweb
+    cp index.html /web/pyweb/index.html
+    cp index.py /web/pyweb/index.py
 }
 
 # 安装 aria2
@@ -86,7 +88,7 @@ function set_config(){
     # 设置 py 文件
     cp index.py /web/pyweb
     # 开放防火墙
-    sudo firewall-cmd --zone=public --add-port=51413/tcp --permanent
+    sudo firewall-cmd --zone=public --add-port=80/tcp --permanent
     sudo firewall-cmd --reload
 }
 
@@ -111,6 +113,7 @@ function customize_set(){
 # 设置显示
 function customzie_view(){
     echo "------------------------------------------"
+    echo -e " 请访问 地址 \033[32m $local_ip \033[0m"
     echo -e " 定义的下载文件默认目录为 \033[32m $downpath \033[0m "
     echo -e " aria secret 为: \033[32m $secret \033[0m"
 }
@@ -135,7 +138,8 @@ case $input_para in
         install_flask
         set_config
         customize_set
-        python index.py
+        customzie_view
+        nohup python index.py $local_ip &
         ;;
     "2")
         uninstall_cpaa

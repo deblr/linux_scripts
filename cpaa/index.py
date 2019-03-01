@@ -1,5 +1,6 @@
 #!/bin/python
 from flask import Flask,send_file
+import sys
 
 app = Flask(__name__)
 
@@ -9,4 +10,5 @@ def index():
 
 
 if __name__ == '__main__':
-    app.run()
+    ip=sys.argv[0]
+    app.run(host=ip,port=80)
