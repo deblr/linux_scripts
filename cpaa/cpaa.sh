@@ -89,6 +89,7 @@ function set_config(){
     cp index.py /web/pyweb
     # 开放防火墙
     sudo firewall-cmd --zone=public --add-port=80/tcp --permanent
+    sudo firewall-cmd --zone=public --add-port=6800/tcp --permanent
     sudo firewall-cmd --reload
 }
 
