@@ -13,11 +13,7 @@ function cpaa_help(){
     echo "q. 退出"
 }
 
-#创建运行目录，并进入
-user_local=`users |cut -d ' ' -f1`
-sudo mkdir /etc/cpaa /web/pyweb
-sudo chown $user_local /etc/cpaa /web/pyweb
-sudo chgrp $user_local /etc/cpaa /web/pyweb
+
 
 # 检查环境和依赖
 function check_Env(){
@@ -41,27 +37,37 @@ function check_Env(){
         echo -e " Install pip \t\t\t\t\t\t  [\033[32m  OK  \033[0m]"
         sudo rm -rf get-pip.py
     fi
+    #创建运行目录，并进入
+    user_local=`users |cut -d ' ' -f1`
+    sudo test -e /etc/cpaa && echo "you already have /etc/cpaa" || mkdir /etc/cpaa
+    sudo test -e /web/pyweb && echo "you already have /web/pyweb" || mkdir /web/pyweb
+    sudo chown $user_local /etc/cpaa /web/pyweb
+    sudo chgrp $user_local /etc/cpaa /web/pyweb
 }
 
 # 安装 aria2
 function install_aria2(){
-    yum install -y epel-release
+    sudo yum install -y epel-release
     echo "--------------------------"
     echo " Install aria2"
     yum install -y aria2
-    if [ ! -f "/usr/bin/aria2" ];then
-        echo -e "install aria2 \033[31m error \033[0m "
+    if [ ! -f "/usr/bin/aria2c" ];then
+        wget -c http://soft.xiaoz.org/linux/aria2-1.34.0-linux-gnu-64bit-build1.tar.bz2
+		tar jxvf aria2-1.34.0-linux-gnu-64bit-build1.tar.bz2
+		cd aria2-1.34.0-linux-gnu-64bit-build1
+		make install
+		cd ..
     fi
 }
 
 # 安装 AriaNg all in one 版本
-function install_AriaNg(){
-    echo "--------------------------"
-    echo " Install AriaNg"
-    wget -O /etc/cpaa/AriaNg.zip https://github.com/mayswind/AriaNg/releases/download/1.0.1/AriaNg-1.0.1-AllInOne.zip
-    unzip /etc/cpaa/AriaNg.zip
-    rm -rf /etc/cpaa/AriaNg.zip
-}
+#function install_AriaNg(){
+#    echo "--------------------------"
+#    echo " Install AriaNg"
+#    wget -O /etc/cpaa/AriaNg.zip https://github.com/mayswind/AriaNg/releases/download/1.0.1/AriaNg-1.0.1-AllInOne.zip
+#    unzip /etc/cpaa/AriaNg.zip
+#    rm -rf /etc/cpaa/AriaNg.zip
+#}
 
 
 # 安装 python-flask
@@ -78,7 +84,10 @@ function set_config(){
     touch /etc/cpaa/aria2.session
     touch /etc/cpaa/aria2.log
     # 设置 py 文件
-    cp index.py /web
+    cp index.py /web/pyweb
+    # 开放防火墙
+    sudo firewall-cmd --zone=public --add-port=51413/tcp --permanent
+    sudo firewall-cmd --reload
 }
 
 # 定制化操作
@@ -95,8 +104,8 @@ function customize_set(){
     done
     # 更改文件
     mkdir -p $downpath
-    sed -i "s%dir=%dir=${downpath}%g" /etc/ccaa/aria2.conf
-    sed -i "s/rpc-secret=/rpc-secret=${secret}/g" /etc/ccaa/aria2.conf
+    sed -i "s%dir=%dir=${downpath}%g" /etc/cpaa/aria2.conf
+    sed -i "s/rpc-secret=/rpc-secret=${secret}/g" /etc/cpaa/aria2.conf
 }
 
 # 设置显示
@@ -116,12 +125,13 @@ function uninstall_cpaa(){
 }
 
 # main 程序
+cpaa_help
 read -p ":" input_para
 case $input_para in
     "1")
         check_Env
         install_aria2
-        install_AriaNg
+#        install_AriaNg
         install_flask
         set_config
         customize_set
