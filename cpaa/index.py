@@ -6,9 +6,9 @@ app = Flask(__name__)
 
 @app.route('/')
 def index():
-    return send_file('/etc/cpaa/index.html')
+    return send_file('/web/pyweb/index.html')
 
 
 if __name__ == '__main__':
-    ip=sys.argv[0]
+    ip=sys.argv[1]
     app.run(host=ip,port=80)

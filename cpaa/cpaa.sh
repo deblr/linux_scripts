@@ -87,6 +87,7 @@ function set_config(){
     touch /etc/cpaa/aria2.log
     # 设置 py 文件
     cp index.py /web/pyweb
+    touch /web/pyweb/web.log
     # 开放防火墙
     sudo firewall-cmd --zone=public --add-port=80/tcp --permanent
     sudo firewall-cmd --zone=public --add-port=6800/tcp --permanent
@@ -143,7 +144,7 @@ case $input_para in
         customize_set
         customzie_view
         nohup aria2c --conf-path=/etc/cpaa/aria2.conf > /etc/cpaa/aria2.log 2>&1 &
-        nohup python index.py $local_ip &
+        nohup python index.py $local_ip > /web/pyweb/web.log 2>&1 &
         ;;
     "2")
         uninstall_cpaa
