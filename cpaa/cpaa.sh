@@ -120,8 +120,10 @@ function customzie_view(){
 
 # 卸载并清空程序
 function uninstall_cpaa(){
-        pid=`pgrep aria2`
-        sudo kill -9 $pid
+        a_pid=`pgrep aria2c`
+        py_pid=`ps -ef|grep index|head -n 1|cut -d " " -f7`
+        sudo kill -9 $a_pid
+        sudo kill -9 $py_pid
         sudo yum remove aria2
         rm -rf /etc/cpaa
         rm -rf /web
@@ -139,6 +141,7 @@ case $input_para in
         set_config
         customize_set
         customzie_view
+        nohup aria2c --conf-path=/etc/cpaa/aria2.conf > /etc/cpaa/aria2.log 2>&1 &
         nohup python index.py $local_ip &
         ;;
     "2")
