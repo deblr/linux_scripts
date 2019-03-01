@@ -15,9 +15,9 @@ function cpaa_help(){
 
 #创建运行目录，并进入
 user_local=`users |cut -d ' ' -f1`
-sudo mkdir /etc/cpaa /web
-sudo chown $user_local /etc/cpaa /web
-sudo chgrp $user_local /etc/cpaa /web
+sudo mkdir /etc/cpaa /web/pyweb
+sudo chown $user_local /etc/cpaa /web/pyweb
+sudo chgrp $user_local /etc/cpaa /web/pyweb
 
 # 检查环境和依赖
 function check_Env(){
@@ -106,6 +106,15 @@ function customzie_view(){
     echo -e " aria secret 为: \033[32m $secret \033[0m"
 }
 
+# 卸载并清空程序
+function uninstall_cpaa(){
+        pid=`pgrep aria2`
+        sudo kill -9 $pid
+        sudo yum remove aria2
+        rm -rf /etc/cpaa
+        rm -rf /web
+}
+
 # main 程序
 read -p ":" input_para
 case $input_para in
@@ -116,10 +125,10 @@ case $input_para in
         install_flask
         set_config
         customize_set
+        python index.py
         ;;
     "2")
-        sudo yum remove aria2
-        rm -rf /etc/cpaa
+        uninstall_cpaa
         ;;
     "3")
         echo "暂时不支持"
