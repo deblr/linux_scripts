@@ -2,7 +2,7 @@
 # 一键安装 aria ， AriaNg ， python-flask
 # Powerd by Deblr
 # Set time : 2019.03.01
-
+#
 # local ip
 local_ip=`hostname -I |cut -d " " -f1`
 # set help
