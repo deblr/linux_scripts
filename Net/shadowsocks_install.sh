@@ -19,6 +19,8 @@ ss_lport=1080
 ss_pocotol=aes-256-cfb
 ss_name=`hostname`
 ss_pwd=HACK_$ss_name
+read -p "请输入自定义密码: " customize_pwd
+read -p "请输入自定义服务器端口: " customize_port
 pip_dir="https://bootstrap.pypa.io/get-pip.py"
 local_ip=`ip route get 1 | cut -d " " -f7`
 
@@ -29,8 +31,8 @@ create_config(){
         {
         "server":"$local_ip",
         "server_port":"$ss_sport",
-        "local_port":"$ss_lport",
-        "password":"$ss_pwd",
+        "local_port":"$customize_port",
+        "password":"$customize_pwd",
         "timeout":600,
         "method":"$ss_pocotol"
         }
