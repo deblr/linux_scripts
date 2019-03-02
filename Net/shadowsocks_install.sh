@@ -30,8 +30,8 @@ create_config(){
         cat > $ss_config  << EOF
         {
         "server":"$local_ip",
-        "server_port":"$ss_sport",
-        "local_port":"$customize_port",
+        "server_port":"$customize_port",
+        "local_port":"$local_ip",
         "password":"$customize_pwd",
         "timeout":600,
         "method":"$ss_pocotol"
