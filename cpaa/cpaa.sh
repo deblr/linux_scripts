@@ -43,7 +43,7 @@ function check_Env(){
     sudo test -e /web/pyweb && echo "you already have /web/pyweb" || mkdir -p /web/pyweb
     sudo chown $user_local /etc/cpaa /web/pyweb
     sudo chgrp $user_local /etc/cpaa /web/pyweb
-    cp index.html /web/pyweb/index.html
+    cp AriaNg /web/pyweb/AriaNg
     cp index.py /web/pyweb/index.py
 }
 
