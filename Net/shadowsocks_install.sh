@@ -11,18 +11,30 @@ echo "# Address <kaisen341125@gmail.com> #"
 echo "===================================#"
 
 
-# set variable
-ss_config=/etc/shadowsocks.json
-ss_rd=/etc/rc.d/rc.local
-# ss_sport=20883
-ss_lport=1080
-ss_pocotol=aes-256-cfb
-# ss_name=`hostname`
-# ss_pwd=HACK_$ss_name
-read -p "请输入自定义密码: " customize_pwd
-read -p "请输入自定义服务器端口: " customize_port
-pip_dir="https://bootstrap.pypa.io/get-pip.py"
-local_ip=`hostname -I |cut -d " " -f1`
+
+
+function read_config(){
+    read -p " 输入服务器端口 :" customize_port
+    read -p " 输入连接用密码 :" customize_pwd
+    # set variable
+    ss_config=/etc/shadowsocks.json
+    ss_rd=/etc/rc.d/rc.local
+    # ss_sport=20883
+    ss_lport=1080
+    ss_pocotol=aes-256-cfb
+    # ss_name=`hostname`
+    # ss_pwd=HACK_$ss_name
+    pip_dir="https://bootstrap.pypa.io/get-pip.py"
+    local_ip=`hostname -I |cut -d " " -f1`
+}
+
+function out_config(){
+    echo -e " 服务器地址为 :" $local_ip
+    echo -e " 服务器端口为 :" $customize_port
+    echo -e " 服务器密码为 :" $customize_pwd
+    echo -e " 客户端端口为 :" $ss_lport
+    echo -e " 服务器加密协议为 :" $ss_pocotol
+}
 
 #### create shadowsocks' config file #####
 function create_config(){
@@ -30,13 +42,13 @@ cat > $ss_config  << EOF
 {
 "server":"$local_ip",
 "server_port":"$customize_port",
-"local_port":"$local_ip",
+"local_port":"$ss_lport",
 "password":"$customize_pwd",
 "timeout":600,
 "method":"$ss_pocotol"
 }
 EOF
-echo -e " creat \t\t\t\t\t\t\t [\033[32m ok \033[0m] "
+echo -e " creat \t\t\t\t\t\t\t\t [\033[32m ok \033[0m] "
 }
 
 #### set help message about more arguments"
@@ -49,7 +61,7 @@ function arguments_message(){
 
 #### Check denpendency ####################
 function install_start_ss(){
-    test -e '/usr/sbin/ssserver' && result=0 || result=1
+    test -e '/usr/bin/ssserver' && result=0 || result=1
     if [ $result == 0 ];
     then
         s_pid=`pgrep sss`
@@ -61,7 +73,7 @@ function install_start_ss(){
         curl "$pip_dir" > /var/get-pip.py && python /var/get-pip.py
         sudo pip install shadowsocks
     fi
-	sudo nohup /usr/sbin/ssserver -c /etc/shadowsocks.json
+	sudo nohup /usr/bin/ssserver -c /etc/shadowsocks.json &
 	sleep 5
 }
 
@@ -79,7 +91,7 @@ function check_start(){
 function clear(){
     sudo pip uninstall shadowsocks
     rm -rf /etc/shadowsocks*
-    rm -rf /usr/sbin/ssserver*
+    rm -rf /usr/bin/ssserver*
 }
 
 #####	change rd.rclocal #####################
@@ -95,13 +107,6 @@ EOF
     fi
 }
 
-function out_config(){
-    echo -e "服务器地址为 :" $local_ip
-    echo -e "服务器端口为 :" $customize_port
-    echo -e "服务器密码为 :" $customize_pwd
-    echo -e "客户端端口为 :" $ss_lport
-    echo -e "服务器加密协议为 :" $ss_pocotol
-}
 ##########################################
 #	main
 ##########################################
@@ -109,6 +114,7 @@ arguments_message
 read -p ":" istype
 case $istype in
     "1")
+        read_config
         create_config
         install_start_ss
         check_start
